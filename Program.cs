@@ -38,34 +38,13 @@ namespace President
 
             for (int i = 0; i < allCandidates.Count; i++)
             {
-               
                 Campaign campaign = allCandidates[i].makeCampaign(new DateTime(2015, 03, 25), new DateTime(2015, 03, 01));
                 allCampaigns.Add(campaign);
                 List<Voter> tempVoters = new List<Voter>(campaign.makeVoters());
-                allVotersList=allVotersList.Concat(tempVoters).ToList();
-
+                allVotersList = allVotersList.Concat(tempVoters).ToList();
             }
 
-
-
-            //MobsterCandidate politic = new MobsterCandidate("Valio", "EDU", 10000);
-            //Campaign camp = politic.makeCampaign(new DateTime(2015, 03, 20), new DateTime(2015, 03, 01));
-            //allCampaigns.Add(camp);
-            //List<Voter> allVotersFromCampOne = new List<Voter>(camp.makeVoters());
-
-            //ShowmanCandidate mobster = new ShowmanCandidate("Teo", "SUI", 10000);
-            //Campaign camp2 = mobster.makeCampaign(new DateTime(2015, 03, 20), new DateTime(2015, 03, 01));
-            //allCampaigns.Add(camp2);
-
-            //List<Voter> allVotersfromCampTwo = new List<Voter>(camp2.makeVoters());
-
-            //ShowmanCandidate showman = new ShowmanCandidate("LILI", "SDY", 50000);
-            //Campaign camp3 = showman.makeCampaign(new DateTime(2015, 03, 20), new DateTime(2015, 03, 10));
-            //List<Voter> allVotersfromCampThree = new List<Voter>(camp3.makeVoters());
-
             CIK cik = new CIK();
-
-            //List<Voter> allVotersList = allVotersFromCampOne.Concat(allVotersfromCampTwo).ToList();
 
             var queryForAllVoters =
             from voter in allVotersList
@@ -86,7 +65,6 @@ namespace President
 
             WinnerORunnerUp winner = cik.findWinner(resultsFromVoting);
             Console.WriteLine("Winner is: " + winner.getName() + " with: " + winner.getVote() + " votes");
-
 
             WinnerORunnerUp runnerUp = cik.runnerUp(resultsFromVoting);
             Console.WriteLine("Runner up is: " + runnerUp.getName() + " with: " + runnerUp.getVote() + " votes");
@@ -112,17 +90,11 @@ namespace President
                 Console.WriteLine(type.Key + "->" + type.Value);
             }
 
-            Console.WriteLine("City with max vote: " +cik.cityWithMaxVotes(resultsFromVoting));
+            Console.WriteLine("City with max vote: " + cik.cityWithMaxVotes(resultsFromVoting));
 
             Console.WriteLine("City with minimum invalid vote: " + cik.findCityWithMinVotes());
 
             Console.WriteLine("City with maximum paid vote: " + cik.cityWithMaxPaidVotes(allCampaigns));
-            //Console.WriteLine("Invalid ballots: "+cik.invalidBallots);
-            //Console.WriteLine("Valid ballots: "+ (allVotersList.Count()- cik.invalidBallots));
-
-
-
-
 
 
         }
