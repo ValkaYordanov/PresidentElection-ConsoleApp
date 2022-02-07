@@ -10,10 +10,8 @@ namespace President
         Random random = new Random();
         List<string> listOfNamesAndGenders = new List<string> { "Valentin male", "Georgi male", "Petyr male", "Galena female", "Ivan male", "Strahilka female", "Petra female", "Dancho male", "Gery female", "Vasil male", "Ivanka female" };
         List<string> listOfCities = new List<string> { "Varna", "Sofia", "Veliko Tyrnovo", "Byrgas", "Smolqn", "Kazanlak", "Pernik" };
-        List<Voter> allVoters = new List<Voter>();
-        List<Voter> unlearnedVoters = new List<Voter>();
-        List<Voter> middleClassVoters = new List<Voter>();
-        List<Voter> richVoters = new List<Voter>();
+       
+       
 
 
 
@@ -25,7 +23,7 @@ namespace President
             int days = (int)(this.startDate - this.endDate).TotalDays;
             int totalVoters = days * 120;
             int paidVoters = (totalVoters / 100) * 50;
-
+            List<Voter> allVoters = new List<Voter>();
 
 
             for (int i = 0; i < totalVoters; i++)
@@ -41,28 +39,29 @@ namespace President
 
                 if (randomVoterType == 1)
                 {
-                    UnlearnedVoter unlearnedVoter = new UnlearnedVoter(name, gender, city, this.candidate, false);
+                    UnlearnedVoter unlearnedVoter = new UnlearnedVoter(name, gender, city, this.candidate, false, this);
                     unlearnedVoters.Add(unlearnedVoter);
                 }
                 else if (randomVoterType == 2)
                 {
-                    MiddleClassVoter middleClassVoter = new MiddleClassVoter(name, gender, city, this.candidate, false);
+                    MiddleClassVoter middleClassVoter = new MiddleClassVoter(name, gender, city, this.candidate, false, this);
                     middleClassVoters.Add(middleClassVoter);
                 }
                 else if (randomVoterType == 3)
                 {
-                    RichVoter richVoter = new RichVoter(name, gender, city, this.candidate, false);
+                    RichVoter richVoter = new RichVoter(name, gender, city, this.candidate, false, this);
                     richVoters.Add(richVoter);
                 }
             }
 
-            unlearnedVoters = unlearnedVotersFilter(unlearnedVoters);
-            middleClassVoters = middleClassVotersFilter(middleClassVoters);
-            richVoters = richVotersFilter(richVoters);
+            //unlearnedVoters = unlearnedVotersFilter(unlearnedVoters);
+            //middleClassVoters = middleClassVotersFilter(middleClassVoters);
+            //richVoters = richVotersFilter(richVoters);
 
             allVoters.AddRange(unlearnedVoters);
             allVoters.AddRange(middleClassVoters);
             allVoters.AddRange(richVoters);
+            //allVotesForCampaign = allVoters.Count();
 
             for (int i = 0; i < paidVoters; i++)
             {

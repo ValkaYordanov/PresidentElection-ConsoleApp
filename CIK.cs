@@ -37,51 +37,57 @@ namespace President
             {
                 foreach (var voter in cityKey)
                 {
-                    if (voter is UnlearnedVoter)
+
+                    if (voter.Vote(voter))
                     {
-                        int chanceToFail = random.Next(1, 101);
-                        if (chanceToFail < 40)
+
+                        if (voter is UnlearnedVoter)
                         {
-                            invalidBallots++;
-                            cityWithInvalidVates(voter.getCity());
-                            continue;
+                            int chanceToFail = random.Next(1, 101);
+                            if (chanceToFail < 40)
+                            {
+                                invalidBallots++;
+                                cityWithInvalidVotes(voter.getCity());
+                                continue;
+                            }
+
+                        }
+                        else if (voter is MiddleClassVoter)
+                        {
+                            int chanceToFail = random.Next(1, 101);
+                            if (chanceToFail < 10)
+                            {
+                                invalidBallots++;
+                                cityWithInvalidVotes(voter.getCity());
+                                continue;
+                            }
                         }
 
-                    }
-                    else if (voter is MiddleClassVoter)
-                    {
-                        int chanceToFail = random.Next(1, 101);
-                        if (chanceToFail < 10)
+                        if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                         {
-                            invalidBallots++;
-                            cityWithInvalidVates(voter.getCity());
-                            continue;
-                        }
-                    }
-
-                    if (!candidatesResults.ContainsKey(voter.getCandidateName()))
-                    {
-                        candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
-                        candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
-                    }
-                    else
-                    {
-                        if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
-                        {
-                            candidatesResults[voter.getCandidateName()][cityKey.Key]++;
+                            candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
+                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
                         }
                         else
                         {
-                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
+                            {
+                                candidatesResults[voter.getCandidateName()][cityKey.Key]++;
+                            }
+                            else
+                            {
+                                candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            }
                         }
                     }
+                    else { continue; }
 
                 }
             }
             return candidatesResults;
         }
 
-        private void cityWithInvalidVates(string city)
+        private void cityWithInvalidVotes(string city)
         {
             if (!cityWithInvalidBallots.ContainsKey(city))
             {

@@ -46,12 +46,15 @@ namespace President
 
             CIK cik = CIK.Instance;
 
+
             var queryForAllVoters =
             from voter in allVotersList
             group voter by voter.getCity() into newGroup
             orderby newGroup.Key
             select newGroup;
 
+            //cik.startVoting(allVotersList); -< da dade po grad vsichki koito sa glasuvali i sa uspqli dadadat validna buletina
+            
             Dictionary<string, Dictionary<string, int>> resultsFromVoting = cik.startVoting(queryForAllVoters);
 
             foreach (var candidate in resultsFromVoting)
