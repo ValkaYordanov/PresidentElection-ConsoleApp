@@ -57,6 +57,18 @@ namespace President
             
             Dictionary<string, Dictionary<string, int>> resultsFromVoting = cik.startVoting(queryForAllVoters);
 
+            allVotersList.Clear();
+            for (int i = 0; i < allCampaigns.Count; i++)
+            {
+               
+                allVotersList.AddRange(allCampaigns[i].GetCampaignVoters());
+            }
+            queryForAllVoters =
+            from voter in allVotersList
+            group voter by voter.getCity() into newGroup
+            orderby newGroup.Key
+            select newGroup;
+
             foreach (var candidate in resultsFromVoting)
             {
                 Console.WriteLine(candidate.Key + ":");

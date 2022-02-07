@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace President
@@ -27,5 +28,12 @@ namespace President
         }
 
         public abstract List<Voter> makeVoters();
+
+        public List<Voter> GetCampaignVoters ()
+        {
+            List<Voter> allVoters = new List<Voter>(unlearnedVoters.Concat(middleClassVoters).Concat(richVoters));
+           
+            return allVoters;
+        }
     }
 }
