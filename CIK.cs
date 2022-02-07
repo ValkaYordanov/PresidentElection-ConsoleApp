@@ -7,6 +7,23 @@ namespace President
 {
     public class CIK
     {
+
+        private static CIK instance = null;
+        private CIK() { }
+
+        public static CIK Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new CIK();
+                return instance;
+
+            }
+        }
+
+
+
         Random random = new Random();
         Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
         Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
@@ -330,11 +347,11 @@ namespace President
         public string findCityWithMinVotes()
         {
             int minVote = Int32.MaxValue;
-            string nameOfCity="";
+            string nameOfCity = "";
 
             foreach (var city in cityWithInvalidBallots)
             {
-                
+
                 if (city.Value < minVote)
                 {
                     minVote = city.Value;

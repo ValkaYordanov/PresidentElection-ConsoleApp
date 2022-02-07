@@ -36,7 +36,7 @@ namespace President
             allCandidates.Add(politicD);
 
 
-            for (int i = 0; i < allCandidates.Count; i++)
+            for (int i = 0; i < allCandidates.Count; i++) 
             {
                 Campaign campaign = allCandidates[i].makeCampaign(new DateTime(2015, 03, 25), new DateTime(2015, 03, 01));
                 allCampaigns.Add(campaign);
@@ -44,7 +44,7 @@ namespace President
                 allVotersList = allVotersList.Concat(tempVoters).ToList();
             }
 
-            CIK cik = new CIK();
+            CIK cik = CIK.Instance;
 
             var queryForAllVoters =
             from voter in allVotersList
