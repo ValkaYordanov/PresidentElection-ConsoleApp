@@ -245,11 +245,11 @@ namespace President
 
             for (int i = 0; i < allCampaigns.Count; i++)
             {
-                allVotes += allCampaigns[i].GetCampaignVoters().Count;
+                allVotes += allCampaigns[i].allVotesForCampaign;
 
                 if (allCampaigns[i] is IllegalCampaign)
                 {
-                    paid += allCampaigns[i].GetCampaignVoters().Count;
+                    paid += allCampaigns[i].allVotesForCampaign;
                 }
 
             }

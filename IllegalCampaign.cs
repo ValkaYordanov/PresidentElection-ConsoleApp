@@ -54,14 +54,12 @@ namespace President
                 }
             }
 
-            //unlearnedVoters = unlearnedVotersFilter(unlearnedVoters);
-            //middleClassVoters = middleClassVotersFilter(middleClassVoters);
-            //richVoters = richVotersFilter(richVoters);
+           
 
             allVoters.AddRange(unlearnedVoters);
             allVoters.AddRange(middleClassVoters);
             allVoters.AddRange(richVoters);
-            //allVotesForCampaign = allVoters.Count();
+            allVotesForCampaign = allVoters.Count();
 
             for (int i = 0; i < paidVoters; i++)
             {
@@ -93,43 +91,5 @@ namespace President
 
         }
 
-        private List<Voter> unlearnedVotersFilter(List<Voter> unlearnedVoters)
-        {
-            int numberOfUnlearnedVoters = unlearnedVoters.Count;
-            int numbersNotGointToPoll = numberOfUnlearnedVoters * 10 / 100;
-            int numbersOfGoingToPoll = numberOfUnlearnedVoters - numbersNotGointToPoll;
-
-            allVotesForCampaign += numberOfUnlearnedVoters;
-            allVotesForCampaignThatGoesToPoll += numbersOfGoingToPoll;
-
-            unlearnedVoters.RemoveRange(1, numbersNotGointToPoll);
-            return unlearnedVoters;
-        }
-
-        private List<Voter> middleClassVotersFilter(List<Voter> middleClassVoters)
-        {
-            int numberOfMiddleClassVoters = middleClassVoters.Count;
-            int numbersNotGointToPoll = numberOfMiddleClassVoters * 30 / 100;
-            int numbersOfGoingToPoll = numberOfMiddleClassVoters - numbersNotGointToPoll;
-
-            allVotesForCampaign += numberOfMiddleClassVoters;
-            allVotesForCampaignThatGoesToPoll += numbersOfGoingToPoll;
-
-            middleClassVoters.RemoveRange(1, numbersNotGointToPoll);
-            return middleClassVoters;
-        }
-
-        private List<Voter> richVotersFilter(List<Voter> richVoters)
-        {
-            int numberOfRichVoters = richVoters.Count;
-            int numbersNotGointToPoll = numberOfRichVoters * 50 / 100;
-            int numbersOfGoingToPoll = numberOfRichVoters - numbersNotGointToPoll;
-
-            allVotesForCampaign += numberOfRichVoters;
-            allVotesForCampaignThatGoesToPoll += numbersOfGoingToPoll;
-
-            richVoters.RemoveRange(1, numbersNotGointToPoll);
-            return richVoters;
-        }
     }
 }
