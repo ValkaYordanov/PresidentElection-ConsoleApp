@@ -9,6 +9,7 @@ namespace President
     {
 
         private static CIK instance = null;
+        public Dictionary<string, int> educationVotesList = new Dictionary<string, int>();
         private CIK() { }
 
         public static CIK Instance
@@ -63,6 +64,8 @@ namespace President
                             }
                         }
 
+                        VotesBasedOnEducation(voter);
+
                         if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                         {
                             candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
@@ -85,6 +88,20 @@ namespace President
                 }
             }
             return candidatesResults;
+        }
+
+        public void VotesBasedOnEducation(Voter voter)
+        {
+            Candidate candidate = voter.getCandidate();
+
+            if(!educationVotesList.ContainsKey(candidate.GetEducation()))
+            {
+                educationVotesList.Add(candidate.GetEducation(), 1);
+            }
+            else
+            {
+                educationVotesList[candidate.GetEducation()]++;
+            }
         }
 
         private void cityWithInvalidVotes(string city)

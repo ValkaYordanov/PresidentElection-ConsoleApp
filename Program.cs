@@ -121,6 +121,11 @@ namespace President
 
             Console.WriteLine("City with maximum paid vote: " + cik.cityWithMaxPaidVotes(allCampaigns));
 
+            Dictionary<string,int> educationListWithVotes = new Dictionary<string, int>(cik.educationVotesList);
+            foreach (var education in educationListWithVotes)
+            {
+                Console.WriteLine(education.Key + " -> " + education.Value);
+            }
 
         }
     }

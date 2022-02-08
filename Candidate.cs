@@ -18,6 +18,12 @@ namespace President
         {
             return city;
         }
+
+        public string GetEducation()
+        {
+            return education;
+        }
+
         public Candidate(string name, string education, decimal money, string city)
         {
             this.name = name;
