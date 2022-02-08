@@ -30,7 +30,7 @@ namespace President
         public int invalidBallots = 0;
 
 
-        public Dictionary<string, Dictionary<string, int>> startVoting(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters)
+        public Dictionary<string, Dictionary<string, int>> startVoting(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters, List<Candidate> allCandidates)
         {
 
             foreach (var cityKey in queryForAllVoters)
@@ -38,7 +38,7 @@ namespace President
                 foreach (var voter in cityKey)
                 {
 
-                    if (voter.Vote(voter))
+                    if (voter.Vote(voter, allCandidates))
                     {
 
                         if (voter is UnlearnedVoter)
@@ -402,6 +402,28 @@ namespace President
 
 
             return cityName;
+        }
+
+        public Dictionary<string, List<string>> CandidateWithCity(List<Candidate> allCandidate)
+        {
+            Dictionary<string, List<string>> citiesAndCandidates = new Dictionary<string, List<string>>();
+
+            foreach (var candidate in allCandidate)
+            {
+                if (!citiesAndCandidates.ContainsKey(candidate.GetCity()))
+                {
+                    citiesAndCandidates.Add(candidate.GetCity(), new List<string>());
+                    citiesAndCandidates[candidate.GetCity()].Add(candidate.getNameOfCandidate());
+                }
+                else
+                {
+
+                    citiesAndCandidates[candidate.GetCity()].Add(candidate.getNameOfCandidate());
+
+                }
+            }
+
+            return citiesAndCandidates;
         }
 
     }

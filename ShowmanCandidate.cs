@@ -7,8 +7,8 @@ namespace President
 {
     public class ShowmanCandidate : Candidate
     {
-        public ShowmanCandidate(string name, string education, decimal money) : base(name, education, money)
-        {}
+        public ShowmanCandidate(string name, string education, decimal money, string city) : base(name, education, money, city)
+        { }
 
         public override Campaign makeCampaign(Date startDate, Date endDate)
         {

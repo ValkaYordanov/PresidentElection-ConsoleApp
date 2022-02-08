@@ -36,6 +36,16 @@ namespace President
         {
             return candidate.getNameOfCandidate();
         }
+
+        public void setCandidate(Candidate candidate)
+        {
+            this.candidate = candidate;
+        }
+
+        public Candidate getCandidate()
+        {
+            return candidate;
+        }
         public Voter(string name, string gender, string city, Candidate candidate, bool paid, Campaign campaign)
         {
             this.name = name;
@@ -47,7 +57,7 @@ namespace President
         }
 
 
-        public bool Vote(Voter voter)
+        public bool Vote(Voter voter, List<Candidate> allCandidates)
         {
             bool giveVote = true;
             int percentageNotGoing = 0;
@@ -77,6 +87,12 @@ namespace President
                 listOfVolters.Remove(voter);
             }
 
+            if (voter is MiddleClassVoter || voter is RichVoter)
+            {
+                ChangeCandidate(voter, allCandidates);
+            }
+
+
             if (giveVote)
             {
                 voter.GetCampaign().allVotesForCampaignThatGoesToPoll++;
@@ -86,5 +102,29 @@ namespace President
             return giveVote;
         }
 
+        private void ChangeCandidate(Voter voter, List<Candidate> allCandidates)
+        {
+            int percentageForOtherCandidate = 0;
+
+            if (voter is MiddleClassVoter)
+            {
+                percentageForOtherCandidate = 30;
+            }
+            else if (voter is RichVoter)
+            {
+                percentageForOtherCandidate = 50;
+            }
+
+            int chanceNotToChangeCandidate = random.Next(1, 101);
+            if (chanceNotToChangeCandidate < percentageForOtherCandidate)
+            {
+                List<Candidate> tempList = new List<Candidate>(allCandidates);
+                int newRandomCandidate = random.Next(0, allCandidates.Count-1);
+                tempList.Remove(voter.getCandidate());
+
+                voter.setCandidate(tempList[newRandomCandidate]);
+                tempList.Clear();
+            }
+        }
     }
 }
