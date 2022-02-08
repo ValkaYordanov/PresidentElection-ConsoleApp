@@ -94,7 +94,7 @@ namespace President
         {
             Candidate candidate = voter.getCandidate();
 
-            if(!educationVotesList.ContainsKey(candidate.GetEducation()))
+            if (!educationVotesList.ContainsKey(candidate.GetEducation()))
             {
                 educationVotesList.Add(candidate.GetEducation(), 1);
             }
@@ -241,12 +241,12 @@ namespace President
 
             int allVotes = returnAllGoingVotes(allCampaigns);
 
-
+            Dictionary<string, int> citiesAndTheirAllVotes = new Dictionary<string, int>(ReturnAllCitiesWithAllVotes(allCampaigns));
 
             foreach (var city in citiesActivityVotes)
             {
                 double percentage = 0.0;
-                percentage = Math.Round((double)citiesActivityVotes[city.Key] * 100 / allVotes, 2);
+                percentage = Math.Round((double)citiesActivityVotes[city.Key] * 100 / citiesAndTheirAllVotes[city.Key], 2);
                 citiesActivity[city.Key] = percentage;
             }
 
@@ -254,6 +254,31 @@ namespace President
 
             return citiesActivity;
         }
+
+        private Dictionary<string, int> ReturnAllCitiesWithAllVotes(List<Campaign> allCampaigns)
+        {
+            Dictionary<string, int> citiesAndAllVotes = new Dictionary<string, int>();
+
+            foreach (var campaign in allCampaigns)
+            {
+                foreach (var city in campaign.allVotesPerCity)
+                {
+                    if (!citiesAndAllVotes.ContainsKey(city.Key))
+                    {
+                        citiesAndAllVotes.Add(city.Key, city.Value);
+                    }
+                    else
+                    {
+                        citiesAndAllVotes[city.Key] += city.Value;
+                    }
+
+                }
+
+            }
+
+            return citiesAndAllVotes;
+        }
+
         public double paidVotes(List<Campaign> allCampaigns)
         {
             double percentage;

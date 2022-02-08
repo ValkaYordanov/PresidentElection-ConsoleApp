@@ -15,6 +15,7 @@ namespace President
         public int allVotesForCampaignThatGoesToPoll;
         public int paidVotes;
         public Dictionary<string, int> citiesWithMaxPaidVotes = new Dictionary<string, int>();
+        public Dictionary<string, int> allVotesPerCity = new Dictionary<string, int>();
         public List<Voter> unlearnedVoters = new List<Voter>();
         public List<Voter> middleClassVoters = new List<Voter>();
         public List<Voter> richVoters = new List<Voter>();
@@ -34,6 +35,18 @@ namespace President
             List<Voter> allVoters = new List<Voter>(unlearnedVoters.Concat(middleClassVoters).Concat(richVoters));
            
             return allVoters;
+        }
+
+        public void VotesPerCity(string city)
+        {
+            if (!allVotesPerCity.ContainsKey(city))
+            {
+                allVotesPerCity.Add(city, 1);
+            }
+            else
+            {
+                allVotesPerCity[city]++;
+            }
         }
     }
 }

@@ -9,9 +9,9 @@ namespace President
     {
         Random random = new Random();
         List<string> listOfNamesAndGenders = new List<string> { "Valentin male", "Georgi male", "Petyr male", "Galena female", "Ivan male", "Strahilka female", "Petra female", "Dancho male", "Gery female", "Vasil male", "Ivanka female" };
-        List<string> listOfCities = new List<string> { "Varna", "Sofia", "Veliko Tyrnovo", "Byrgas", "Smolqn", "Kazanlak", "Pernik"};
-       
-       
+        List<string> listOfCities = new List<string> { "Varna", "Sofia", "Veliko Tyrnovo", "Byrgas", "Smolqn", "Kazanlak", "Pernik" };
+
+
         public LegalCampaign(DateTime startDate, DateTime endDate, decimal compaignMoney, Candidate candidate) : base(startDate, endDate, compaignMoney, candidate)
         { }
 
@@ -31,6 +31,7 @@ namespace President
 
                 int indexOfRandomCity = random.Next(listOfCities.Count);
                 string city = listOfCities[indexOfRandomCity];
+                VotesPerCity(city);
 
                 if (randomVoterType == 1)
                 {
@@ -50,7 +51,7 @@ namespace President
 
             }
 
-            
+
 
             allVoters.AddRange(unlearnedVoters);
             allVoters.AddRange(middleClassVoters);
@@ -60,7 +61,7 @@ namespace President
 
             return allVoters;
         }
-
        
+
     }
 }

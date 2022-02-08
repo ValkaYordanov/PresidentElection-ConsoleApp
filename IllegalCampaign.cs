@@ -35,7 +35,8 @@ namespace President
                 string gender = listOfNamesAndGenders[indexOfRandomName].Split(' ').Skip(1).FirstOrDefault();
 
                 int indexOfRandomCity = random.Next(listOfCities.Count);
-                string city = listOfCities[indexOfRandomCity];
+                string city = listOfCities[indexOfRandomCity]; 
+                VotesPerCity(city);
 
                 if (randomVoterType == 1)
                 {
