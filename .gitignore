@@ -1,12 +1,11 @@
-# Folders to ignore #
-OutputRoot/
-TestResults/
-bin/
-obj/
-BuildOutput/
-
-# Known files to ignore always #
-*.suo
-*.user
-~*.docx
-*.metaproj*
+*.config
+*.dll
+*.dll
+*.pdb
+*.dll
+*.pdb
+President/bin/
+President/obj/
+President/.vs/
+*.cache
+President/.vs/
