@@ -7,64 +7,104 @@ namespace President
 {
     public class CIK
     {
+
+        private static CIK instance = null;
+        public Dictionary<string, int> educationVotesList = new Dictionary<string, int>();
+        private CIK() { }
+
+        public static CIK Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new CIK();
+                return instance;
+
+            }
+        }
+
+
+
         Random random = new Random();
         Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
         Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
         public int invalidBallots = 0;
 
 
-        public Dictionary<string, Dictionary<string, int>> startVoting(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters)
+        public Dictionary<string, Dictionary<string, int>> startVoting(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters, List<Candidate> allCandidates)
         {
 
             foreach (var cityKey in queryForAllVoters)
             {
                 foreach (var voter in cityKey)
                 {
-                    if (voter is UnlearnedVoter)
+
+                    if (voter.Vote(voter, allCandidates))
                     {
-                        int chanceToFail = random.Next(1, 101);
-                        if (chanceToFail < 40)
+
+                        if (voter is UnlearnedVoter)
                         {
-                            invalidBallots++;
-                            cityWithInvalidVates(voter.getCity());
-                            continue;
+                            int chanceToFail = random.Next(1, 101);
+                            if (chanceToFail < 40)
+                            {
+                                invalidBallots++;
+                                cityWithInvalidVotes(voter.getCity());
+                                continue;
+                            }
+
+                        }
+                        else if (voter is MiddleClassVoter)
+                        {
+                            int chanceToFail = random.Next(1, 101);
+                            if (chanceToFail < 10)
+                            {
+                                invalidBallots++;
+                                cityWithInvalidVotes(voter.getCity());
+                                continue;
+                            }
                         }
 
-                    }
-                    else if (voter is MiddleClassVoter)
-                    {
-                        int chanceToFail = random.Next(1, 101);
-                        if (chanceToFail < 10)
-                        {
-                            invalidBallots++;
-                            cityWithInvalidVates(voter.getCity());
-                            continue;
-                        }
-                    }
+                        VotesBasedOnEducation(voter);
 
-                    if (!candidatesResults.ContainsKey(voter.getCandidateName()))
-                    {
-                        candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
-                        candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
-                    }
-                    else
-                    {
-                        if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
+                        if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                         {
-                            candidatesResults[voter.getCandidateName()][cityKey.Key]++;
+                            candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
+                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
                         }
                         else
                         {
-                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
+                            {
+                                candidatesResults[voter.getCandidateName()][cityKey.Key]++;
+                            }
+                            else
+                            {
+                                candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            }
                         }
                     }
+                    else { continue; }
 
                 }
             }
             return candidatesResults;
         }
 
-        private void cityWithInvalidVates(string city)
+        public void VotesBasedOnEducation(Voter voter)
+        {
+            Candidate candidate = voter.getCandidate();
+
+            if (!educationVotesList.ContainsKey(candidate.GetEducation()))
+            {
+                educationVotesList.Add(candidate.GetEducation(), 1);
+            }
+            else
+            {
+                educationVotesList[candidate.GetEducation()]++;
+            }
+        }
+
+        private void cityWithInvalidVotes(string city)
         {
             if (!cityWithInvalidBallots.ContainsKey(city))
             {
@@ -201,12 +241,12 @@ namespace President
 
             int allVotes = returnAllGoingVotes(allCampaigns);
 
-
+            Dictionary<string, int> citiesAndTheirAllVotes = new Dictionary<string, int>(ReturnAllCitiesWithAllVotes(allCampaigns));
 
             foreach (var city in citiesActivityVotes)
             {
                 double percentage = 0.0;
-                percentage = Math.Round((double)citiesActivityVotes[city.Key] * 100 / allVotes, 2);
+                percentage = Math.Round((double)citiesActivityVotes[city.Key] * 100 / citiesAndTheirAllVotes[city.Key], 2);
                 citiesActivity[city.Key] = percentage;
             }
 
@@ -214,6 +254,31 @@ namespace President
 
             return citiesActivity;
         }
+
+        private Dictionary<string, int> ReturnAllCitiesWithAllVotes(List<Campaign> allCampaigns)
+        {
+            Dictionary<string, int> citiesAndAllVotes = new Dictionary<string, int>();
+
+            foreach (var campaign in allCampaigns)
+            {
+                foreach (var city in campaign.allVotesPerCity)
+                {
+                    if (!citiesAndAllVotes.ContainsKey(city.Key))
+                    {
+                        citiesAndAllVotes.Add(city.Key, city.Value);
+                    }
+                    else
+                    {
+                        citiesAndAllVotes[city.Key] += city.Value;
+                    }
+
+                }
+
+            }
+
+            return citiesAndAllVotes;
+        }
+
         public double paidVotes(List<Campaign> allCampaigns)
         {
             double percentage;
@@ -330,11 +395,11 @@ namespace President
         public string findCityWithMinVotes()
         {
             int minVote = Int32.MaxValue;
-            string nameOfCity="";
+            string nameOfCity = "";
 
             foreach (var city in cityWithInvalidBallots)
             {
-                
+
                 if (city.Value < minVote)
                 {
                     minVote = city.Value;
@@ -379,6 +444,28 @@ namespace President
 
 
             return cityName;
+        }
+
+        public Dictionary<string, List<string>> CandidateWithCity(List<Candidate> allCandidate)
+        {
+            Dictionary<string, List<string>> citiesAndCandidates = new Dictionary<string, List<string>>();
+
+            foreach (var candidate in allCandidate)
+            {
+                if (!citiesAndCandidates.ContainsKey(candidate.GetCity()))
+                {
+                    citiesAndCandidates.Add(candidate.GetCity(), new List<string>());
+                    citiesAndCandidates[candidate.GetCity()].Add(candidate.getNameOfCandidate());
+                }
+                else
+                {
+
+                    citiesAndCandidates[candidate.GetCity()].Add(candidate.getNameOfCandidate());
+
+                }
+            }
+
+            return citiesAndCandidates;
         }
 
     }
