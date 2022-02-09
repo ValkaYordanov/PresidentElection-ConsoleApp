@@ -4,10 +4,9 @@
 *.pdb
 *.dll
 *.pdb
-President/bin/
-President/obj/
+/bin
+/obj
 President/.vs/
 *.cache
-President/.vs/
 *.suo
-*.vs
+/.vs
