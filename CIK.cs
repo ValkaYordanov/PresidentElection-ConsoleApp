@@ -33,7 +33,7 @@ namespace President
                 {
                     voter.Vote(allCandidates);
 
-                    if (voter.GetGoingToVote())
+                    if (voter.GetGoingToVote() && !voter.GetInvalidVote())
                     {
                         CalculateVotesBasedOnEducation(voter);
 
