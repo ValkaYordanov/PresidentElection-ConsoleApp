@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace President
 {
@@ -10,6 +9,9 @@ namespace President
 
         private static CIK instance = null;
         public Dictionary<string, int> educationVotesList = new Dictionary<string, int>();
+        Random random = new Random();
+        Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
+        Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
         private CIK() { }
 
         public static CIK Instance
@@ -23,22 +25,14 @@ namespace President
             }
         }
 
-
-
-        Random random = new Random();
-        Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
-        Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
-
-
-
-        public Dictionary<string, Dictionary<string, int>> startVoting(IOrderedEnumerable<IGrouping<string, Voter>> listOfAllVotersSortedByCity, List<Candidate> allCandidates)
+        public Dictionary<string, Dictionary<string, int>> StartVoting(IOrderedEnumerable<IGrouping<string, Voter>> listOfAllVotersSortedByCity, List<Candidate> allCandidates)
         {
             foreach (var cityKey in listOfAllVotersSortedByCity)
             {
                 foreach (var voter in cityKey)
                 {
                     voter.Vote(allCandidates);
-                    VotesBasedOnEducation(voter);
+                    CalculateVotesBasedOnEducation(voter);
 
                     if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                     {
@@ -63,7 +57,7 @@ namespace President
             return candidatesResults;
         }
 
-        public void VotesBasedOnEducation(Voter voter)
+        public void CalculateVotesBasedOnEducation(Voter voter)
         {
             Candidate candidate = voter.getCandidate();
 
@@ -79,7 +73,7 @@ namespace President
 
 
 
-        public WinnerORunnerUp findWinner(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
+        public WinnerORunnerUp FindWinner(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
         {
             WinnerORunnerUp winner = new WinnerORunnerUp();
             int vote = 0;
@@ -102,7 +96,7 @@ namespace President
             return winner;
 
         }
-        public WinnerORunnerUp runnerUp(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
+        public WinnerORunnerUp FindRunnerUp(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
         {
             Dictionary<string, Dictionary<string, int>> resultsFromVotingTemp = new Dictionary<string, Dictionary<string, int>>();
 
@@ -117,7 +111,6 @@ namespace President
                     }
                     else
                     {
-                        //resultsFromVotingTemp[candidate.Key].Add(city.Key, city.Value);
                         if (!resultsFromVotingTemp[candidate.Key].ContainsKey(city.Key))
                         {
                             resultsFromVotingTemp[candidate.Key].Add(city.Key, city.Value);
@@ -128,7 +121,7 @@ namespace President
             }
 
 
-            WinnerORunnerUp winnerMax = findWinner(resultsFromVotingTemp);
+            WinnerORunnerUp winnerMax = FindWinner(resultsFromVotingTemp);
             resultsFromVotingTemp.Remove(winnerMax.getName());
             WinnerORunnerUp runnerUp = new WinnerORunnerUp();
             int vote = 0;
@@ -152,7 +145,7 @@ namespace President
 
         }
 
-        public double electionActivity(List<Campaign> allCampaigns)
+        public double CalculateElectionActivity(List<Campaign> allCampaigns)
         {
             double activity;
             int allVotes = 0;
@@ -169,7 +162,7 @@ namespace President
         }
 
 
-        public double FindInvalidBallots(List<Campaign> allCampaigns)
+        public double FindPercentageOfInvalidBallots(List<Campaign> allCampaigns)
         {
             double percentage;
             int allVotes = 0;
@@ -189,7 +182,7 @@ namespace President
             return percentage;
         }
 
-        public Dictionary<string, double> cityActivity(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters, List<Voter> allVotersList, List<Campaign> allCampaigns)
+        public Dictionary<string, double> CalculateCityActivityForEachCity(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters, List<Voter> allVotersList, List<Campaign> allCampaigns)
         {
             Dictionary<string, double> citiesActivity = new Dictionary<string, double>();
             Dictionary<string, int> citiesActivityVotes = new Dictionary<string, int>();
@@ -208,7 +201,7 @@ namespace President
                 citiesActivityVotes[allVotersList[i].getCity()]++;
             }
 
-            int allVotes = returnAllGoingVotes(allCampaigns);
+            int allVotes = ReturnNumberOfAllGoingVotes(allCampaigns);
 
             Dictionary<string, int> citiesAndTheirAllVotes = new Dictionary<string, int>(ReturnAllCitiesWithAllVotes(allCampaigns));
 
@@ -248,7 +241,7 @@ namespace President
             return citiesAndAllVotes;
         }
 
-        public double paidVotes(List<Campaign> allCampaigns)
+        public double CalculatePercentageOfAllPaidVotes(List<Campaign> allCampaigns)
         {
             double percentage;
             int allVotes = 0;
@@ -270,7 +263,7 @@ namespace President
             return percentage;
         }
 
-        private int returnAllGoingVotes(List<Campaign> allCampaigns)
+        private int ReturnNumberOfAllGoingVotes(List<Campaign> allCampaigns)
         {
             int allVotes = 0;
 
@@ -283,7 +276,7 @@ namespace President
             return allVotes;
         }
 
-        public Dictionary<string, string> favCandidate(List<Voter> allVotersList)
+        public Dictionary<string, string> CalculateFavoriteCandidateForEachVoterType(List<Voter> allVotersList)
         {
             Dictionary<string, Dictionary<string, int>> favBasedOnVoterType = new Dictionary<string, Dictionary<string, int>>();
             Dictionary<string, string> favcandidate = new Dictionary<string, string>();
@@ -326,7 +319,7 @@ namespace President
             return favcandidate;
         }
 
-        public string cityWithMaxVotes(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
+        public string FindCityWithMaxVotes(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
         {
             string cityName = "";
             int votes = 0;
@@ -402,7 +395,7 @@ namespace President
 
 
 
-        public string cityWithMaxPaidVotes(List<Campaign> allCampaigns)
+        public string FindCityWithMaxPaidVotes(List<Campaign> allCampaigns)
         {
             string cityName = "";
             int votes = Int32.MaxValue;
@@ -438,7 +431,7 @@ namespace President
             return cityName;
         }
 
-        public Dictionary<string, List<string>> CandidateWithCity(List<Candidate> allCandidate)
+        public Dictionary<string, List<string>> ReturnAllCitiesAndCandidatesInEachCity(List<Candidate> allCandidate)
         {
             Dictionary<string, List<string>> citiesAndCandidates = new Dictionary<string, List<string>>();
 
