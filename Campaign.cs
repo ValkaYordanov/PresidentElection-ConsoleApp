@@ -14,6 +14,7 @@ namespace President
         public int allVotesForCampaign;
         public int allVotesForCampaignThatGoesToPoll;
         public int paidVotes;
+        public int invalidVotes = 0;
         public Dictionary<string, int> citiesWithMaxPaidVotes = new Dictionary<string, int>();
         public Dictionary<string, int> allVotesPerCity = new Dictionary<string, int>();
         public List<Voter> unlearnedVoters = new List<Voter>();

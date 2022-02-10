@@ -28,62 +28,35 @@ namespace President
         Random random = new Random();
         Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
         Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
-        public int invalidBallots = 0;
 
 
-        public Dictionary<string, Dictionary<string, int>> startVoting(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters, List<Candidate> allCandidates)
+
+        public Dictionary<string, Dictionary<string, int>> startVoting(IOrderedEnumerable<IGrouping<string, Voter>> listOfAllVotersSortedByCity, List<Candidate> allCandidates)
         {
-
-            foreach (var cityKey in queryForAllVoters)
+            foreach (var cityKey in listOfAllVotersSortedByCity)
             {
                 foreach (var voter in cityKey)
                 {
+                    voter.Vote(allCandidates);
+                    VotesBasedOnEducation(voter);
 
-                    if (voter.Vote(voter, allCandidates))
+                    if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                     {
-
-                        if (voter is UnlearnedVoter)
+                        candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
+                        candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                    }
+                    else
+                    {
+                        if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
                         {
-                            int chanceToFail = random.Next(1, 101);
-                            if (chanceToFail < 40)
-                            {
-                                invalidBallots++;
-                                cityWithInvalidVotes(voter.getCity());
-                                continue;
-                            }
-
-                        }
-                        else if (voter is MiddleClassVoter)
-                        {
-                            int chanceToFail = random.Next(1, 101);
-                            if (chanceToFail < 10)
-                            {
-                                invalidBallots++;
-                                cityWithInvalidVotes(voter.getCity());
-                                continue;
-                            }
-                        }
-
-                        VotesBasedOnEducation(voter);
-
-                        if (!candidatesResults.ContainsKey(voter.getCandidateName()))
-                        {
-                            candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
-                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            candidatesResults[voter.getCandidateName()][cityKey.Key]++;
                         }
                         else
                         {
-                            if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
-                            {
-                                candidatesResults[voter.getCandidateName()][cityKey.Key]++;
-                            }
-                            else
-                            {
-                                candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
-                            }
+                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
                         }
                     }
-                    else { continue; }
+
 
                 }
             }
@@ -104,17 +77,7 @@ namespace President
             }
         }
 
-        private void cityWithInvalidVotes(string city)
-        {
-            if (!cityWithInvalidBallots.ContainsKey(city))
-            {
-                cityWithInvalidBallots.Add(city, 1);
-            }
-            else
-            {
-                cityWithInvalidBallots[city]++;
-            }
-        }
+
 
         public WinnerORunnerUp findWinner(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
         {
@@ -206,16 +169,22 @@ namespace President
         }
 
 
-        public double findInvalidBallots(List<Campaign> allCampaigns)
+        public double FindInvalidBallots(List<Campaign> allCampaigns)
         {
             double percentage;
             int allVotes = 0;
+            int invalidBallots = 0;
 
             for (int i = 0; i < allCampaigns.Count; i++)
             {
-                allVotes += allCampaigns[i].allVotesForCampaign;
-
+                allVotes += allCampaigns[i].GetCampaignVoters().Count;
             }
+
+            foreach (var campaign in allCampaigns)
+            {
+                invalidBallots += campaign.invalidVotes;
+            }
+
             percentage = Math.Round((double)invalidBallots * 100 / allVotes, 2);
             return percentage;
         }
@@ -392,10 +361,31 @@ namespace President
             return cityName;
         }
 
-        public string findCityWithMinVotes()
+        public string FindCityWithMinInvalidVotes(List<Voter> allVotersList)
         {
             int minVote = Int32.MaxValue;
             string nameOfCity = "";
+
+            foreach (var voter in allVotersList)
+            {
+                if (voter.GetInvalidVote())
+                {
+                    if (!cityWithInvalidBallots.ContainsKey(voter.getCity()))
+                    {
+                        cityWithInvalidBallots.Add(voter.getCity(), 1);
+                    }
+                    else
+                    {
+                        cityWithInvalidBallots[voter.getCity()]++;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+
 
             foreach (var city in cityWithInvalidBallots)
             {
@@ -409,6 +399,8 @@ namespace President
 
             return nameOfCity;
         }
+
+
 
         public string cityWithMaxPaidVotes(List<Campaign> allCampaigns)
         {

@@ -47,7 +47,7 @@ namespace President
             CIK cik = CIK.Instance;
 
 
-            var queryForAllVoters =
+            var listOfAllVotersSortedByCity =
             from voter in allVotersList
             group voter by voter.getCity() into newGroup
             orderby newGroup.Key
@@ -55,7 +55,7 @@ namespace President
 
             //cik.startVoting(allVotersList); -< da dade po grad vsichki koito sa glasuvali i sa uspqli dadadat validna buletina
             
-            Dictionary<string, Dictionary<string, int>> resultsFromVoting = cik.startVoting(queryForAllVoters, allCandidates);
+            Dictionary<string, Dictionary<string, int>> resultsFromVoting = cik.startVoting(listOfAllVotersSortedByCity, allCandidates);
 
             allVotersList.Clear();
             for (int i = 0; i < allCampaigns.Count; i++)
@@ -63,7 +63,7 @@ namespace President
                
                 allVotersList.AddRange(allCampaigns[i].GetCampaignVoters());
             }
-            queryForAllVoters =
+            listOfAllVotersSortedByCity =
             from voter in allVotersList
             group voter by voter.getCity() into newGroup
             orderby newGroup.Key
@@ -88,7 +88,7 @@ namespace President
 
             Console.WriteLine("Election activity: " + cik.electionActivity(allCampaigns) + "%");
 
-            Dictionary<string, double> dictionaryOfAllCity = cik.cityActivity(queryForAllVoters, allVotersList, allCampaigns);
+            Dictionary<string, double> dictionaryOfAllCity = cik.cityActivity(listOfAllVotersSortedByCity, allVotersList, allCampaigns);
 
             foreach (var city in dictionaryOfAllCity)
             {
@@ -97,7 +97,7 @@ namespace President
 
             Console.WriteLine("Paid votes: " + cik.paidVotes(allCampaigns) + "%");
 
-            Console.WriteLine("Invalid ballots: " + cik.findInvalidBallots(allCampaigns) + "%");
+            Console.WriteLine("Invalid ballots: " + cik.FindInvalidBallots(allCampaigns) + "%");
 
             var citiesAndCandidates = cik.CandidateWithCity(allCandidates);
             foreach (var city in citiesAndCandidates)
@@ -117,7 +117,7 @@ namespace President
 
             Console.WriteLine("City with max vote: " + cik.cityWithMaxVotes(resultsFromVoting));
 
-            Console.WriteLine("City with minimum invalid vote: " + cik.findCityWithMinVotes());
+            Console.WriteLine("City with minimum invalid vote: " + cik.FindCityWithMinInvalidVotes(allVotersList));
 
             Console.WriteLine("City with maximum paid vote: " + cik.cityWithMaxPaidVotes(allCampaigns));
 
