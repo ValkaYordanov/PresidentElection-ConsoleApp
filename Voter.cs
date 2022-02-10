@@ -13,9 +13,19 @@ namespace President
         protected bool paid;
         protected Campaign campaign;
         protected bool invalidVote;
+        protected bool goingToVote;
 
         protected Random random = new Random();
 
+        public void SetGoinToVote(bool goingToVote)
+        {
+            this.goingToVote = goingToVote;
+        }
+
+        public bool GetGoingToVote()
+        {
+            return goingToVote;
+        }
         public void SetToInvalidVote(bool invalidVote)
         {
             this.invalidVote = invalidVote;
@@ -58,7 +68,7 @@ namespace President
         {
             return candidate;
         }
-        public Voter(string name, string gender, string city, Candidate candidate, bool paid, Campaign campaign, bool invalidVote)
+        public Voter(string name, string gender, string city, Candidate candidate, bool paid, Campaign campaign, bool invalidVote, bool goingToVote)
         {
             this.name = name;
             this.gender = gender;
@@ -67,6 +77,7 @@ namespace President
             this.paid = paid;
             this.campaign = campaign;
             this.invalidVote = invalidVote;
+            this.goingToVote = goingToVote;
         }
 
         public abstract void Vote(List<Candidate> allCandidates);

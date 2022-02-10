@@ -32,23 +32,31 @@ namespace President
                 foreach (var voter in cityKey)
                 {
                     voter.Vote(allCandidates);
-                    CalculateVotesBasedOnEducation(voter);
 
-                    if (!candidatesResults.ContainsKey(voter.getCandidateName()))
+                    if (voter.GetGoingToVote())
                     {
-                        candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
-                        candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
-                    }
-                    else
-                    {
-                        if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
+                        CalculateVotesBasedOnEducation(voter);
+
+                        if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                         {
-                            candidatesResults[voter.getCandidateName()][cityKey.Key]++;
+                            candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
+                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
                         }
                         else
                         {
-                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
+                            {
+                                candidatesResults[voter.getCandidateName()][cityKey.Key]++;
+                            }
+                            else
+                            {
+                                candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            }
                         }
+                    }
+                    else
+                    {
+                        continue;
                     }
 
 

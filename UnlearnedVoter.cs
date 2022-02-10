@@ -6,12 +6,11 @@ namespace President
 {
     public class UnlearnedVoter : Voter
     {
-        public UnlearnedVoter(string name, string gender, string city, Candidate candidate, bool paid, Campaign campaign, bool invalidVote) 
-            : base(name, gender, city, candidate, paid, campaign, invalidVote) { }
+        public UnlearnedVoter(string name, string gender, string city, Candidate candidate, bool paid, Campaign campaign, bool invalidVote, bool goingToVote) 
+            : base(name, gender, city, candidate, paid, campaign, invalidVote, goingToVote) { }
        
         public override void Vote(List<Candidate> allCandidates)
         {
-            bool giveVote = true;
             int percentageNotGoing = 10;
             List<Voter> listOfVolters = new List<Voter>();
 
@@ -20,11 +19,11 @@ namespace President
             int chanceNotToGo = random.Next(1, 101);
             if (chanceNotToGo < percentageNotGoing)
             {
-                giveVote = false;
+                this.SetGoinToVote(false);
                 listOfVolters.Remove(this);
             }
 
-            if (giveVote)
+            if (this.GetGoingToVote())
             {
                 this.GetCampaign().allVotesForCampaignThatGoesToPoll++;
 
