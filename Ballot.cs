@@ -6,8 +6,36 @@ namespace President
 {
     public class Ballot
     {
-        public bool isValid { get; set; }
-        public Candidate candidate { get; set; }
-        public string city { get; set; }
+        private bool isValid { get; set; }
+        private Candidate candidate { get; set; }
+        private string city { get; set; }
+
+
+        public void SetIsValid(bool isValid)
+        {
+            this.isValid = isValid;
+        }
+        public bool GetIsValid()
+        {
+            return isValid;
+        }
+        public void SetCity(string city)
+        {
+            this.city = city;
+        }
+        public string GetCity()
+        {
+            return city;
+        }
+
+        public void SetCandidate(Candidate candidate)
+        {
+            this.candidate = candidate;
+        }
+
+        public Candidate GetCandidate()
+        {
+            return candidate;
+        }
     }
 }

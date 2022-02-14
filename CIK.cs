@@ -11,7 +11,6 @@ namespace President
         public Dictionary<string, int> educationVotesList = new Dictionary<string, int>();
         Random random = new Random();
         Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
-        Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
         public List<Candidate> candidates = new List<Candidate>();
         public List<Ballot> ballots = new List<Ballot>();
         private CIK() { }
@@ -45,9 +44,13 @@ namespace President
                 {
                     Ballot ballot = voter.Vote();
 
-                    if (ballot != null && ballot.isValid)
+                    if (ballot != null)
                     {
                         ballots.Add(ballot);
+                    }
+
+                    if (ballot != null && ballot.GetIsValid())
+                    {
                         CalculateVotesBasedOnEducation(voter);
 
                         if (!candidatesResults.ContainsKey(voter.getCandidateName()))
@@ -182,24 +185,20 @@ namespace President
             return activity;
         }
 
-
-        public double FindPercentageOfInvalidBallots(List<Campaign> allCampaigns)
+        public double FindPercentageOfInvalidBallots()
         {
             double percentage;
-            int allVotes = 0;
             int invalidBallots = 0;
 
-            for (int i = 0; i < allCampaigns.Count; i++)
+            foreach (var ballot in ballots)
             {
-                allVotes += allCampaigns[i].GetCampaignVoters().Count;
+               if(!ballot.GetIsValid())
+                {
+                    invalidBallots++;
+                }
             }
 
-            foreach (var campaign in allCampaigns)
-            {
-                invalidBallots += campaign.invalidVotes;
-            }
-
-            percentage = Math.Round((double)invalidBallots * 100 / allVotes, 2);
+            percentage = Math.Round((double)invalidBallots * 100 / ballots.Count, 2);
             return percentage;
         }
 
@@ -375,22 +374,24 @@ namespace President
             return cityName;
         }
 
-        public string FindCityWithMinInvalidVotes(List<Voter> allVotersList)
+
+        public string FindCityWithMinInvalidVotes()
         {
+            Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
             int minVote = Int32.MaxValue;
             string nameOfCity = "";
 
-            foreach (var voter in allVotersList)
+            foreach (var ballot in ballots)
             {
-                if (voter.GetInvalidVote())
+                if (!ballot.GetIsValid())
                 {
-                    if (!cityWithInvalidBallots.ContainsKey(voter.getCity()))
+                    if (!cityWithInvalidBallots.ContainsKey(ballot.GetCity()))
                     {
-                        cityWithInvalidBallots.Add(voter.getCity(), 1);
+                        cityWithInvalidBallots.Add(ballot.GetCity(), 1);
                     }
                     else
                     {
-                        cityWithInvalidBallots[voter.getCity()]++;
+                        cityWithInvalidBallots[ballot.GetCity()]++;
                     }
                 }
                 else

@@ -59,8 +59,7 @@ namespace President
             allVotersList.Clear();
             for (int i = 0; i < allCampaigns.Count; i++)
             {
-               
-                allVotersList.AddRange(allCampaigns[i].GetCampaignVoters());
+                allVotersList.AddRange(allCampaigns[i].allVotersInCampaign);
             }
             listOfAllVotersSortedByCity =
             from voter in allVotersList
@@ -83,7 +82,7 @@ namespace President
             WinnerORunnerUp runnerUp = cik.FindRunnerUp(resultsFromVoting);
             Console.WriteLine("Runner up is: " + runnerUp.getName() + " with: " + runnerUp.getVote() + " votes");
 
-            Console.WriteLine("All voters/ballots: " + allVotersList.Count());
+            Console.WriteLine("All voters that vote: " + allVotersList.Count());
 
             Console.WriteLine("Election activity: " + cik.CalculateElectionActivity(allCampaigns) + "%");
 
@@ -96,7 +95,7 @@ namespace President
 
             Console.WriteLine("Paid votes: " + cik.CalculatePercentageOfAllPaidVotes(allCampaigns) + "%");
 
-            Console.WriteLine("Invalid ballots: " + cik.FindPercentageOfInvalidBallots(allCampaigns) + "%");
+            Console.WriteLine("Invalid ballots: " + cik.FindPercentageOfInvalidBallots() + "%");
 
             var citiesAndCandidates = cik.ReturnAllCitiesAndCandidatesInEachCity(allCandidates);
             foreach (var city in citiesAndCandidates)
@@ -116,7 +115,7 @@ namespace President
 
             Console.WriteLine("City with max vote: " + cik.FindCityWithMaxVotes(resultsFromVoting));
 
-            Console.WriteLine("City with minimum invalid vote: " + cik.FindCityWithMinInvalidVotes(allVotersList));
+            Console.WriteLine("City with minimum invalid vote: " + cik.FindCityWithMinInvalidVotes());
 
             Console.WriteLine("City with maximum paid vote: " + cik.FindCityWithMaxPaidVotes(allCampaigns));
 
