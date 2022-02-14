@@ -40,17 +40,17 @@ namespace President
 
                 if (randomVoterType == 1)
                 {
-                    UnlearnedVoter unlearnedVoter = new UnlearnedVoter(name, gender, city, this.candidate, false, this, false, true);
+                    UnlearnedVoter unlearnedVoter = new UnlearnedVoter(name, gender, city, this.candidate, false);
                     unlearnedVoters.Add(unlearnedVoter);
                 }
                 else if (randomVoterType == 2)
                 {
-                    MiddleClassVoter middleClassVoter = new MiddleClassVoter(name, gender, city, this.candidate, false, this, false, true);
+                    MiddleClassVoter middleClassVoter = new MiddleClassVoter(name, gender, city, this.candidate, false);
                     middleClassVoters.Add(middleClassVoter);
                 }
                 else if (randomVoterType == 3)
                 {
-                    RichVoter richVoter = new RichVoter(name, gender, city, this.candidate, false, this, false, true);
+                    RichVoter richVoter = new RichVoter(name, gender, city, this.candidate, false);
                     richVoters.Add(richVoter);
                 }
             }

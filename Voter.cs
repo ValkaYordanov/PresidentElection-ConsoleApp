@@ -68,19 +68,59 @@ namespace President
         {
             return candidate;
         }
-        public Voter(string name, string gender, string city, Candidate candidate, bool paid, Campaign campaign, bool invalidVote, bool goingToVote)
+        public Voter(string name, string gender, string city, Candidate candidate, bool paid)
         {
             this.name = name;
             this.gender = gender;
             this.city = city;
             this.candidate = candidate;
             this.paid = paid;
-            this.campaign = campaign;
-            this.invalidVote = invalidVote;
-            this.goingToVote = goingToVote;
         }
 
-        public abstract void Vote(List<Candidate> allCandidates);
+        public Ballot Vote()
+        {
+            Ballot ballot = new Ballot();
+
+            var percentToVote = GetPercentNotToVote();
+
+            int chanceNotToGo = random.Next(1, 101);
+            if (chanceNotToGo < percentToVote)
+            {
+                return null;
+            }
+
+            var percentToFail = GetPercentForInvalidBallot();
+
+            int chanceToFail = random.Next(1, 101);
+            if (chanceToFail < percentToFail)
+            {
+                ballot.isValid = false;
+                return ballot;
+            }
+
+            ballot.isValid = true;
+            ballot.city = this.getCity();
+
+            var percentToVoteForOtherCandidate = GetPercentToVoteForOtherCandidate();
+
+            int chanceToVoteForOtherCandidate = random.Next(1, 101);
+            if (chanceToVoteForOtherCandidate > percentToVoteForOtherCandidate)
+            {
+                ballot.candidate = this.candidate;
+            }
+            else
+            {
+                CIK cik = CIK.Instance;
+                ballot.candidate = cik.GetRandomCandidate(this.candidate);
+            }
+
+
+            return ballot;
+        }
+
+        public abstract int GetPercentNotToVote();
+        public abstract int GetPercentForInvalidBallot();
+        public abstract int GetPercentToVoteForOtherCandidate();
         protected void ChangeCandidate(int percentage, List<Candidate> allCandidates)
         {
             int percentageForOtherCandidate = percentage;

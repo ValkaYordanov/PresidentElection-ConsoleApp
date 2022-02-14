@@ -12,6 +12,8 @@ namespace President
         Random random = new Random();
         Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
         Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
+        public List<Candidate> candidates = new List<Candidate>();
+        public List<Ballot> ballots = new List<Ballot>();
         private CIK() { }
 
         public static CIK Instance
@@ -25,16 +27,27 @@ namespace President
             }
         }
 
+        public Candidate GetRandomCandidate(Candidate candidateToExclude)
+        {
+            candidates.Remove(candidateToExclude);
+            int randomCandidate = random.Next(0, candidates.Count());
+            Candidate candidate = candidates[randomCandidate];
+            candidates.Add(candidateToExclude);
+
+            return candidate;
+        }
+
         public Dictionary<string, Dictionary<string, int>> StartVoting(IOrderedEnumerable<IGrouping<string, Voter>> listOfAllVotersSortedByCity, List<Candidate> allCandidates)
         {
             foreach (var cityKey in listOfAllVotersSortedByCity)
             {
                 foreach (var voter in cityKey)
                 {
-                    voter.Vote(allCandidates);
+                    Ballot ballot = voter.Vote();
 
-                    if (voter.GetGoingToVote() && !voter.GetInvalidVote())
+                    if (ballot != null && ballot.isValid)
                     {
+                        ballots.Add(ballot);
                         CalculateVotesBasedOnEducation(voter);
 
                         if (!candidatesResults.ContainsKey(voter.getCandidateName()))

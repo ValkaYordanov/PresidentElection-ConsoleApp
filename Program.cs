@@ -45,7 +45,7 @@ namespace President
             }
 
             CIK cik = CIK.Instance;
-
+            cik.candidates = allCandidates;
 
             var listOfAllVotersSortedByCity =
             from voter in allVotersList
