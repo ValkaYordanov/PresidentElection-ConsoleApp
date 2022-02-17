@@ -53,19 +53,17 @@ namespace President
                         if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                         {
                             candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
-                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 0);
                         }
-                        else
+
+                        if (!candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
                         {
-                            if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
-                            {
-                                candidatesResults[voter.getCandidateName()][cityKey.Key]++;
-                            }
-                            else
-                            {
-                                candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
-                            }
+                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 0);
+                           
                         }
+
+                        candidatesResults[voter.getCandidateName()][cityKey.Key]++;
+
                     }
                 }
             }
@@ -95,7 +93,7 @@ namespace President
             return educationsAndVotes;
         }
 
-        private Dictionary<Candidate,int> CalculateVotesForEachCandidate()
+        private Dictionary<Candidate, int> CalculateVotesForEachCandidate()
         {
             Dictionary<Candidate, int> candidatesAndTheirVotes = new Dictionary<Candidate, int>();
             foreach (var ballot in ballots)
@@ -155,7 +153,7 @@ namespace President
             WinnerORunnerUp runnerUp = new WinnerORunnerUp();
             runnerUp = FindWinnerOrRunnerUp(candidatesAndTheirVotes);
 
-            
+
             return runnerUp;
 
         }
