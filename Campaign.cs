@@ -18,7 +18,7 @@ namespace President
         public Dictionary<string, int> citiesWithMaxPaidVotes = new Dictionary<string, int>();
         public Dictionary<string, int> allVotesPerCity = new Dictionary<string, int>();
         public List<Voter> allVotersInCampaign = new List<Voter>();
-
+        public enum VoterTypes { UnlearnedVoter = 1, MiddleClassVoter = 2, RichVoter = 3 }
         Random random = new Random();
         List<string> listOfNamesAndGenders = new List<string> { "Valentin male", "Georgi male", "Petyr male", "Galena female", "Ivan male", "Strahilka female", "Petra female", "Dancho male", "Gery female", "Vasil male", "Ivanka female" };
         List<string> listOfCities = new List<string> { "Varna", "Sofia", "Veliko Tyrnovo", "Byrgas", "Smolqn", "Kazanlak", "Pernik" };
@@ -57,17 +57,17 @@ namespace President
             string city = listOfCities[indexOfRandomCity];
             VotesPerCity(city);
 
-            if (randomVoterType == 1)
+            if (randomVoterType == (int)VoterTypes.UnlearnedVoter)
             {
                 UnlearnedVoter unlearnedVoter = new UnlearnedVoter(name, gender, city, this.candidate, false, this);
                 return unlearnedVoter;
             }
-            else if (randomVoterType == 2)
+            else if (randomVoterType == (int)VoterTypes.MiddleClassVoter)
             {
                 MiddleClassVoter middleClassVoter = new MiddleClassVoter(name, gender, city, this.candidate, false, this);
                 return middleClassVoter;
             }
-            else if (randomVoterType == 3)
+            else if (randomVoterType == (int)VoterTypes.RichVoter)
             {
                 RichVoter richVoter = new RichVoter(name, gender, city, this.candidate, false, this);
                 return richVoter;

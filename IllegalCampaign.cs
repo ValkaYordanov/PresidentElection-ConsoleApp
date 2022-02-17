@@ -8,10 +8,11 @@ namespace President
     public class IllegalCampaign : Campaign
     {
         Random random = new Random();
-        List<string> listOfNamesAndGenders = new List<string> { "Valentin male", "Georgi male", "Petyr male", "Galena female", "Ivan male", "Strahilka female", "Petra female", "Dancho male", "Gery female", "Vasil male", "Ivanka female" };
-        List<string> listOfCities = new List<string> { "Varna", "Sofia", "Veliko Tyrnovo", "Byrgas", "Smolqn", "Kazanlak", "Pernik" };
-       
-       
+        private const int percentageForCalculatingNumberOfPaidVoters = 50;
+        private const int percentageForCalculatingNumberOfVotersForOneDay = 120;
+        private const int minimummoneyToPayForPaidVoter = 30;
+        private const int maximummoneyToPayForPaidVoter = 51;
+
 
 
 
@@ -21,8 +22,8 @@ namespace President
         public override List<Voter> makeVoters()
         {
             int days = (int)(this.startDate - this.endDate).TotalDays;
-            int totalVoters = days * 120;
-            int paidVoters = (totalVoters / 100) * 50;
+            int totalVoters = days * percentageForCalculatingNumberOfVotersForOneDay;
+            int paidVoters = (totalVoters / 100) * percentageForCalculatingNumberOfPaidVoters;
             List<Voter> allVoters = new List<Voter>();
 
 
@@ -35,7 +36,7 @@ namespace President
 
             for (int i = 0; i < paidVoters; i++)
             {
-                int money = random.Next(30, 51);
+                int money = random.Next(minimummoneyToPayForPaidVoter, maximummoneyToPayForPaidVoter);
 
                 if ((this.compaignMoney - money) < 0)
                 {

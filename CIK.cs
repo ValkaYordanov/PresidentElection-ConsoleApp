@@ -8,7 +8,6 @@ namespace President
     {
 
         private static CIK instance = null;
-        public Dictionary<string, int> educationVotesList = new Dictionary<string, int>();
         Random random = new Random();
         Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
         public List<Candidate> candidates = new List<Candidate>();
@@ -51,8 +50,6 @@ namespace President
 
                     if (ballot != null && ballot.GetIsValid())
                     {
-                        CalculateVotesBasedOnEducation(voter);
-
                         if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                         {
                             candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
@@ -70,101 +67,95 @@ namespace President
                             }
                         }
                     }
-                    else
-                    {
-                        continue;
-                    }
-
-
                 }
             }
             return candidatesResults;
         }
 
-        public void CalculateVotesBasedOnEducation(Voter voter)
+
+        public Dictionary<string, int> CalculateVotesBasedOnEducation()
         {
-            Candidate candidate = voter.getCandidate();
+            Dictionary<string, int> educationsAndVotes = new Dictionary<string, int>();
 
-            if (!educationVotesList.ContainsKey(candidate.GetEducation()))
+            foreach (var ballot in ballots)
             {
-                educationVotesList.Add(candidate.GetEducation(), 1);
-            }
-            else
-            {
-                educationVotesList[candidate.GetEducation()]++;
-            }
-        }
-
-
-
-        public WinnerORunnerUp FindWinner(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
-        {
-            WinnerORunnerUp winner = new WinnerORunnerUp();
-            int vote = 0;
-            int maxVote = 0;
-
-            foreach (var candidate in resultsFromVoting)
-            {
-                vote = 0;
-                foreach (var city in resultsFromVoting[candidate.Key])
+                if (ballot.GetIsValid())
                 {
-                    vote += city.Value;
-                }
-                if (vote > maxVote)
-                {
-                    maxVote = vote;
-                    winner.setName(candidate.Key);
-                    winner.setVote(maxVote);
-                }
-            }
-            return winner;
-
-        }
-        public WinnerORunnerUp FindRunnerUp(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
-        {
-            Dictionary<string, Dictionary<string, int>> resultsFromVotingTemp = new Dictionary<string, Dictionary<string, int>>();
-
-            foreach (var candidate in resultsFromVoting)
-            {
-                foreach (var city in resultsFromVoting[candidate.Key])
-                {
-                    if (!resultsFromVotingTemp.ContainsKey(candidate.Key))
+                    if (!educationsAndVotes.ContainsKey(ballot.GetCandidate().GetEducation()))
                     {
-                        resultsFromVotingTemp.Add(candidate.Key, new Dictionary<string, int>());
-                        resultsFromVotingTemp[candidate.Key].Add(city.Key, city.Value);
+                        educationsAndVotes.Add(ballot.GetCandidate().GetEducation(), 1);
                     }
                     else
                     {
-                        if (!resultsFromVotingTemp[candidate.Key].ContainsKey(city.Key))
-                        {
-                            resultsFromVotingTemp[candidate.Key].Add(city.Key, city.Value);
-                        }
+                        educationsAndVotes[ballot.GetCandidate().GetEducation()]++;
                     }
                 }
-
             }
 
+            return educationsAndVotes;
+        }
 
-            WinnerORunnerUp winnerMax = FindWinner(resultsFromVotingTemp);
-            resultsFromVotingTemp.Remove(winnerMax.getName());
-            WinnerORunnerUp runnerUp = new WinnerORunnerUp();
-            int vote = 0;
-            int maxVote = 0;
-
-            foreach (var candidate in resultsFromVotingTemp)
+        private Dictionary<Candidate,int> CalculateVotesForEachCandidate()
+        {
+            Dictionary<Candidate, int> candidatesAndTheirVotes = new Dictionary<Candidate, int>();
+            foreach (var ballot in ballots)
             {
-                vote = 0;
-                foreach (var city in resultsFromVotingTemp[candidate.Key])
+                if (ballot.GetIsValid())
                 {
-                    vote += city.Value;
-                }
-                if (vote > maxVote)
-                {
-                    maxVote = vote;
-                    runnerUp.setName(candidate.Key);
-                    runnerUp.setVote(maxVote);
+                    if (!candidatesAndTheirVotes.ContainsKey(ballot.GetCandidate()))
+                    {
+                        candidatesAndTheirVotes.Add(ballot.GetCandidate(), 1);
+                    }
+                    else
+                    {
+                        candidatesAndTheirVotes[ballot.GetCandidate()]++;
+                    }
                 }
             }
+
+            return candidatesAndTheirVotes;
+        }
+
+        private WinnerORunnerUp FindWinnerOrRunnerUp(Dictionary<Candidate, int> candidatesAndTheirVotes)
+        {
+            int maxVote = 0;
+            WinnerORunnerUp winnerOrRunnerUpCandidate = new WinnerORunnerUp();
+            foreach (var candidate in candidatesAndTheirVotes)
+            {
+
+                if (candidate.Value > maxVote)
+                {
+                    maxVote = candidate.Value;
+                    winnerOrRunnerUpCandidate.setName(candidate.Key.getNameOfCandidate());
+                    winnerOrRunnerUpCandidate.setVote(maxVote);
+                }
+            }
+
+            return winnerOrRunnerUpCandidate;
+        }
+
+        public WinnerORunnerUp FindWinner()
+        {
+            WinnerORunnerUp winner = new WinnerORunnerUp();
+            Dictionary<Candidate, int> candidatesAndTheirVotes = new Dictionary<Candidate, int>(CalculateVotesForEachCandidate());
+            winner = FindWinnerOrRunnerUp(candidatesAndTheirVotes);
+
+            return winner;
+
+        }
+
+        public WinnerORunnerUp FindRunnerUp()
+        {
+            Dictionary<Candidate, int> candidatesAndTheirVotes = new Dictionary<Candidate, int>(CalculateVotesForEachCandidate());
+
+            WinnerORunnerUp winnerMax = FindWinner();
+            Candidate winnerCandidate = candidates.Find(x => x.getNameOfCandidate() == winnerMax.getName());
+            candidatesAndTheirVotes.Remove(winnerCandidate);
+
+            WinnerORunnerUp runnerUp = new WinnerORunnerUp();
+            runnerUp = FindWinnerOrRunnerUp(candidatesAndTheirVotes);
+
+            
             return runnerUp;
 
         }
@@ -192,7 +183,7 @@ namespace President
 
             foreach (var ballot in ballots)
             {
-               if(!ballot.GetIsValid())
+                if (!ballot.GetIsValid())
                 {
                     invalidBallots++;
                 }

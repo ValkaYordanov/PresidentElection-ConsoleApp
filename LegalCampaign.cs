@@ -7,8 +7,7 @@ namespace President
 {
     public class LegalCampaign : Campaign
     {
-
-
+        private const int percentageForCalculatingNumberOfVotersForOneDay = 100;
 
         public LegalCampaign(DateTime startDate, DateTime endDate, decimal compaignMoney, Candidate candidate) : base(startDate, endDate, compaignMoney, candidate)
         { }
@@ -16,7 +15,7 @@ namespace President
         public override List<Voter> makeVoters()
         {
             int days = (int)(this.startDate - this.endDate).TotalDays;
-            int totalVoters = days * 100;
+            int totalVoters = days * percentageForCalculatingNumberOfVotersForOneDay;
             List<Voter> allVoters = new List<Voter>();
 
             for (int i = 0; i < totalVoters; i++)

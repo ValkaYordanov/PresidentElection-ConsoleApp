@@ -8,19 +8,22 @@ namespace President
     {
         public UnlearnedVoter(string name, string gender, string city, Candidate candidate, bool paid, Campaign campaign) 
             : base(name, gender, city, candidate, paid, campaign) { }
-       
+
+        private const int percentNotToVote = 10;
+        private const int percentForInvalidBallot = 40;
+        private const int percentToVoteForOtherCandidate = 0;
         public override int GetPercentNotToVote()
         {
-            return 10;
+            return percentNotToVote;
         }
         public override int GetPercentForInvalidBallot()
         {
-            return 40;
+            return percentForInvalidBallot;
         }
 
         public override int GetPercentToVoteForOtherCandidate()
         {
-            return 0;
+            return percentToVoteForOtherCandidate;
         }
 
        

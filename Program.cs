@@ -76,10 +76,10 @@ namespace President
                 }
             }
 
-            WinnerORunnerUp winner = cik.FindWinner(resultsFromVoting);
+            WinnerORunnerUp winner = cik.FindWinner();
             Console.WriteLine("Winner is: " + winner.getName() + " with: " + winner.getVote() + " votes");
 
-            WinnerORunnerUp runnerUp = cik.FindRunnerUp(resultsFromVoting);
+            WinnerORunnerUp runnerUp = cik.FindRunnerUp();
             Console.WriteLine("Runner up is: " + runnerUp.getName() + " with: " + runnerUp.getVote() + " votes");
 
             Console.WriteLine("All voters that vote: " + allVotersList.Count());
@@ -119,12 +119,13 @@ namespace President
 
             Console.WriteLine("City with maximum paid vote: " + cik.FindCityWithMaxPaidVotes(allCampaigns));
 
-            Dictionary<string,int> educationListWithVotes = new Dictionary<string, int>(cik.educationVotesList);
-            foreach (var education in educationListWithVotes)
+          
+
+            Dictionary<string, int> eduListVotes = new Dictionary<string, int>(cik.CalculateVotesBasedOnEducation());
+            foreach (var education in eduListVotes)
             {
                 Console.WriteLine(education.Key + " -> " + education.Value);
             }
-
         }
     }
 }
