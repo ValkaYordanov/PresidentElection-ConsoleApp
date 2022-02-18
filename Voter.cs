@@ -12,7 +12,9 @@ namespace President
         protected Candidate candidate;
         protected bool paid;
         protected Campaign campaign;
-        Random random = new Random();
+
+        protected Random random = new Random();
+
         public void SetCampaign(Campaign campaign)
         {
             this.campaign = campaign;
@@ -56,75 +58,53 @@ namespace President
             this.campaign = campaign;
         }
 
-
-        public bool Vote(Voter voter, List<Candidate> allCandidates)
+        public Ballot Vote()
         {
-            bool giveVote = true;
-            int percentageNotGoing = 0;
-            List<Voter> listOfVolters = new List<Voter>();
+            Ballot ballot = new Ballot();
+            ballot.SetIsValid(true);
+            ballot.SetCity(this.getCity());
 
-            if (voter is UnlearnedVoter)
-            {
-                listOfVolters = voter.GetCampaign().unlearnedVoters;
-                percentageNotGoing = 10;
-            }
-            else if (voter is MiddleClassVoter)
-            {
-                percentageNotGoing = 30;
-                listOfVolters = voter.GetCampaign().middleClassVoters;
-            }
-            else if (voter is RichVoter)
-            {
-                listOfVolters = voter.GetCampaign().richVoters;
-                percentageNotGoing = 50;
-            }
-
+            var percentToVote = GetPercentNotToVote();
 
             int chanceNotToGo = random.Next(1, 101);
-            if (chanceNotToGo < percentageNotGoing)
+            if (chanceNotToGo < percentToVote)
             {
-                giveVote = false;
-                listOfVolters.Remove(voter);
+                this.campaign.allVotersInCampaign.Remove(this);
+                return null;
+            }
+            this.GetCampaign().allVotesForCampaignThatGoesToPoll++;
+            var percentToFail = GetPercentForInvalidBallot();
+
+            int chanceToFail = random.Next(1, 101);
+            if (chanceToFail < percentToFail)
+            {
+                ballot.SetIsValid(false);
+                this.campaign.invalidVotes++;
+                return ballot;
             }
 
-            if (voter is MiddleClassVoter || voter is RichVoter)
+
+
+            var percentToVoteForOtherCandidate = GetPercentToVoteForOtherCandidate();
+
+            int chanceToVoteForOtherCandidate = random.Next(1, 101);
+            if (chanceToVoteForOtherCandidate > percentToVoteForOtherCandidate)
             {
-                ChangeCandidate(voter, allCandidates);
+                ballot.SetCandidate(this.candidate);
+            }
+            else
+            {
+                CIK cik = CIK.Instance;
+                ballot.SetCandidate(cik.GetRandomCandidate(this.candidate));
             }
 
 
-            if (giveVote)
-            {
-                voter.GetCampaign().allVotesForCampaignThatGoesToPoll++;
-            }
-
-
-            return giveVote;
+            return ballot;
         }
 
-        private void ChangeCandidate(Voter voter, List<Candidate> allCandidates)
-        {
-            int percentageForOtherCandidate = 0;
-
-            if (voter is MiddleClassVoter)
-            {
-                percentageForOtherCandidate = 30;
-            }
-            else if (voter is RichVoter)
-            {
-                percentageForOtherCandidate = 50;
-            }
-
-            int chanceNotToChangeCandidate = random.Next(1, 101);
-            if (chanceNotToChangeCandidate < percentageForOtherCandidate)
-            {
-                List<Candidate> tempList = new List<Candidate>(allCandidates);
-                int newRandomCandidate = random.Next(0, allCandidates.Count-1);
-                tempList.Remove(voter.getCandidate());
-
-                voter.setCandidate(tempList[newRandomCandidate]);
-                tempList.Clear();
-            }
-        }
+        public abstract int GetPercentNotToVote();
+        public abstract int GetPercentForInvalidBallot();
+        public abstract int GetPercentToVoteForOtherCandidate();
+        
     }
 }

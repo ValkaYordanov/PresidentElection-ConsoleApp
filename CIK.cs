@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace President
 {
@@ -9,7 +8,10 @@ namespace President
     {
 
         private static CIK instance = null;
-        public Dictionary<string, int> educationVotesList = new Dictionary<string, int>();
+        Random random = new Random();
+        Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
+        public List<Candidate> candidates = new List<Candidate>();
+        public List<Ballot> ballots = new List<Ballot>();
         private CIK() { }
 
         public static CIK Instance
@@ -23,173 +25,140 @@ namespace President
             }
         }
 
-
-
-        Random random = new Random();
-        Dictionary<string, Dictionary<string, int>> candidatesResults = new Dictionary<string, Dictionary<string, int>>();
-        Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
-        public int invalidBallots = 0;
-
-
-        public Dictionary<string, Dictionary<string, int>> startVoting(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters, List<Candidate> allCandidates)
+        public Candidate GetRandomCandidate(Candidate candidateToExclude)
         {
+            candidates.Remove(candidateToExclude);
+            int randomCandidate = random.Next(0, candidates.Count());
+            Candidate candidate = candidates[randomCandidate];
+            candidates.Add(candidateToExclude);
 
-            foreach (var cityKey in queryForAllVoters)
+            return candidate;
+        }
+
+        public Dictionary<string, Dictionary<string, int>> StartVoting(IOrderedEnumerable<IGrouping<string, Voter>> listOfAllVotersSortedByCity, List<Candidate> allCandidates)
+        {
+            foreach (var cityKey in listOfAllVotersSortedByCity)
             {
                 foreach (var voter in cityKey)
                 {
+                    Ballot ballot = voter.Vote();
 
-                    if (voter.Vote(voter, allCandidates))
+                    if (ballot != null)
                     {
+                        ballots.Add(ballot);
+                    }
 
-                        if (voter is UnlearnedVoter)
-                        {
-                            int chanceToFail = random.Next(1, 101);
-                            if (chanceToFail < 40)
-                            {
-                                invalidBallots++;
-                                cityWithInvalidVotes(voter.getCity());
-                                continue;
-                            }
-
-                        }
-                        else if (voter is MiddleClassVoter)
-                        {
-                            int chanceToFail = random.Next(1, 101);
-                            if (chanceToFail < 10)
-                            {
-                                invalidBallots++;
-                                cityWithInvalidVotes(voter.getCity());
-                                continue;
-                            }
-                        }
-
-                        VotesBasedOnEducation(voter);
-
+                    if (ballot != null && ballot.GetIsValid())
+                    {
                         if (!candidatesResults.ContainsKey(voter.getCandidateName()))
                         {
                             candidatesResults.Add(voter.getCandidateName(), new Dictionary<string, int>());
-                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
+                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 0);
                         }
-                        else
-                        {
-                            if (candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
-                            {
-                                candidatesResults[voter.getCandidateName()][cityKey.Key]++;
-                            }
-                            else
-                            {
-                                candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 1);
-                            }
-                        }
-                    }
-                    else { continue; }
 
+                        if (!candidatesResults[voter.getCandidateName()].ContainsKey(cityKey.Key))
+                        {
+                            candidatesResults[voter.getCandidateName()].Add(cityKey.Key, 0);
+                           
+                        }
+
+                        candidatesResults[voter.getCandidateName()][cityKey.Key]++;
+
+                    }
                 }
             }
             return candidatesResults;
         }
 
-        public void VotesBasedOnEducation(Voter voter)
+
+        public Dictionary<string, int> CalculateVotesBasedOnEducation()
         {
-            Candidate candidate = voter.getCandidate();
+            Dictionary<string, int> educationsAndVotes = new Dictionary<string, int>();
 
-            if (!educationVotesList.ContainsKey(candidate.GetEducation()))
+            foreach (var ballot in ballots)
             {
-                educationVotesList.Add(candidate.GetEducation(), 1);
-            }
-            else
-            {
-                educationVotesList[candidate.GetEducation()]++;
-            }
-        }
-
-        private void cityWithInvalidVotes(string city)
-        {
-            if (!cityWithInvalidBallots.ContainsKey(city))
-            {
-                cityWithInvalidBallots.Add(city, 1);
-            }
-            else
-            {
-                cityWithInvalidBallots[city]++;
-            }
-        }
-
-        public WinnerORunnerUp findWinner(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
-        {
-            WinnerORunnerUp winner = new WinnerORunnerUp();
-            int vote = 0;
-            int maxVote = 0;
-
-            foreach (var candidate in resultsFromVoting)
-            {
-                vote = 0;
-                foreach (var city in resultsFromVoting[candidate.Key])
+                if (ballot.GetIsValid())
                 {
-                    vote += city.Value;
-                }
-                if (vote > maxVote)
-                {
-                    maxVote = vote;
-                    winner.setName(candidate.Key);
-                    winner.setVote(maxVote);
-                }
-            }
-            return winner;
-
-        }
-        public WinnerORunnerUp runnerUp(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
-        {
-            Dictionary<string, Dictionary<string, int>> resultsFromVotingTemp = new Dictionary<string, Dictionary<string, int>>();
-
-            foreach (var candidate in resultsFromVoting)
-            {
-                foreach (var city in resultsFromVoting[candidate.Key])
-                {
-                    if (!resultsFromVotingTemp.ContainsKey(candidate.Key))
+                    if (!educationsAndVotes.ContainsKey(ballot.GetCandidate().GetEducation()))
                     {
-                        resultsFromVotingTemp.Add(candidate.Key, new Dictionary<string, int>());
-                        resultsFromVotingTemp[candidate.Key].Add(city.Key, city.Value);
+                        educationsAndVotes.Add(ballot.GetCandidate().GetEducation(), 1);
                     }
                     else
                     {
-                        //resultsFromVotingTemp[candidate.Key].Add(city.Key, city.Value);
-                        if (!resultsFromVotingTemp[candidate.Key].ContainsKey(city.Key))
-                        {
-                            resultsFromVotingTemp[candidate.Key].Add(city.Key, city.Value);
-                        }
+                        educationsAndVotes[ballot.GetCandidate().GetEducation()]++;
                     }
                 }
-
             }
 
+            return educationsAndVotes;
+        }
 
-            WinnerORunnerUp winnerMax = findWinner(resultsFromVotingTemp);
-            resultsFromVotingTemp.Remove(winnerMax.getName());
-            WinnerORunnerUp runnerUp = new WinnerORunnerUp();
-            int vote = 0;
-            int maxVote = 0;
-
-            foreach (var candidate in resultsFromVotingTemp)
+        private Dictionary<Candidate, int> CalculateVotesForEachCandidate()
+        {
+            Dictionary<Candidate, int> candidatesAndTheirVotes = new Dictionary<Candidate, int>();
+            foreach (var ballot in ballots)
             {
-                vote = 0;
-                foreach (var city in resultsFromVotingTemp[candidate.Key])
+                if (ballot.GetIsValid())
                 {
-                    vote += city.Value;
-                }
-                if (vote > maxVote)
-                {
-                    maxVote = vote;
-                    runnerUp.setName(candidate.Key);
-                    runnerUp.setVote(maxVote);
+                    if (!candidatesAndTheirVotes.ContainsKey(ballot.GetCandidate()))
+                    {
+                        candidatesAndTheirVotes.Add(ballot.GetCandidate(), 1);
+                    }
+                    else
+                    {
+                        candidatesAndTheirVotes[ballot.GetCandidate()]++;
+                    }
                 }
             }
+
+            return candidatesAndTheirVotes;
+        }
+
+        private WinnerORunnerUp FindWinnerOrRunnerUp(Dictionary<Candidate, int> candidatesAndTheirVotes)
+        {
+            int maxVote = 0;
+            WinnerORunnerUp winnerOrRunnerUpCandidate = new WinnerORunnerUp();
+            foreach (var candidate in candidatesAndTheirVotes)
+            {
+
+                if (candidate.Value > maxVote)
+                {
+                    maxVote = candidate.Value;
+                    winnerOrRunnerUpCandidate.setName(candidate.Key.getNameOfCandidate());
+                    winnerOrRunnerUpCandidate.setVote(maxVote);
+                }
+            }
+
+            return winnerOrRunnerUpCandidate;
+        }
+
+        public WinnerORunnerUp FindWinner()
+        {
+            WinnerORunnerUp winner = new WinnerORunnerUp();
+            Dictionary<Candidate, int> candidatesAndTheirVotes = new Dictionary<Candidate, int>(CalculateVotesForEachCandidate());
+            winner = FindWinnerOrRunnerUp(candidatesAndTheirVotes);
+
+            return winner;
+
+        }
+
+        public WinnerORunnerUp FindRunnerUp()
+        {
+            Dictionary<Candidate, int> candidatesAndTheirVotes = new Dictionary<Candidate, int>(CalculateVotesForEachCandidate());
+
+            WinnerORunnerUp winnerMax = FindWinner();
+            Candidate winnerCandidate = candidates.Find(x => x.getNameOfCandidate() == winnerMax.getName());
+            candidatesAndTheirVotes.Remove(winnerCandidate);
+
+            WinnerORunnerUp runnerUp = new WinnerORunnerUp();
+            runnerUp = FindWinnerOrRunnerUp(candidatesAndTheirVotes);
+
+
             return runnerUp;
 
         }
 
-        public double electionActivity(List<Campaign> allCampaigns)
+        public double CalculateElectionActivity(List<Campaign> allCampaigns)
         {
             double activity;
             int allVotes = 0;
@@ -205,22 +174,24 @@ namespace President
             return activity;
         }
 
-
-        public double findInvalidBallots(List<Campaign> allCampaigns)
+        public double FindPercentageOfInvalidBallots()
         {
             double percentage;
-            int allVotes = 0;
+            int invalidBallots = 0;
 
-            for (int i = 0; i < allCampaigns.Count; i++)
+            foreach (var ballot in ballots)
             {
-                allVotes += allCampaigns[i].allVotesForCampaign;
-
+                if (!ballot.GetIsValid())
+                {
+                    invalidBallots++;
+                }
             }
-            percentage = Math.Round((double)invalidBallots * 100 / allVotes, 2);
+
+            percentage = Math.Round((double)invalidBallots * 100 / ballots.Count, 2);
             return percentage;
         }
 
-        public Dictionary<string, double> cityActivity(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters, List<Voter> allVotersList, List<Campaign> allCampaigns)
+        public Dictionary<string, double> CalculateCityActivityForEachCity(IOrderedEnumerable<IGrouping<string, Voter>> queryForAllVoters, List<Voter> allVotersList, List<Campaign> allCampaigns)
         {
             Dictionary<string, double> citiesActivity = new Dictionary<string, double>();
             Dictionary<string, int> citiesActivityVotes = new Dictionary<string, int>();
@@ -239,7 +210,7 @@ namespace President
                 citiesActivityVotes[allVotersList[i].getCity()]++;
             }
 
-            int allVotes = returnAllGoingVotes(allCampaigns);
+            int allVotes = ReturnNumberOfAllGoingVotes(allCampaigns);
 
             Dictionary<string, int> citiesAndTheirAllVotes = new Dictionary<string, int>(ReturnAllCitiesWithAllVotes(allCampaigns));
 
@@ -279,7 +250,7 @@ namespace President
             return citiesAndAllVotes;
         }
 
-        public double paidVotes(List<Campaign> allCampaigns)
+        public double CalculatePercentageOfAllPaidVotes(List<Campaign> allCampaigns)
         {
             double percentage;
             int allVotes = 0;
@@ -301,7 +272,7 @@ namespace President
             return percentage;
         }
 
-        private int returnAllGoingVotes(List<Campaign> allCampaigns)
+        private int ReturnNumberOfAllGoingVotes(List<Campaign> allCampaigns)
         {
             int allVotes = 0;
 
@@ -314,7 +285,7 @@ namespace President
             return allVotes;
         }
 
-        public Dictionary<string, string> favCandidate(List<Voter> allVotersList)
+        public Dictionary<string, string> CalculateFavoriteCandidateForEachVoterType(List<Voter> allVotersList)
         {
             Dictionary<string, Dictionary<string, int>> favBasedOnVoterType = new Dictionary<string, Dictionary<string, int>>();
             Dictionary<string, string> favcandidate = new Dictionary<string, string>();
@@ -357,7 +328,7 @@ namespace President
             return favcandidate;
         }
 
-        public string cityWithMaxVotes(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
+        public string FindCityWithMaxVotes(Dictionary<string, Dictionary<string, int>> resultsFromVoting)
         {
             string cityName = "";
             int votes = 0;
@@ -392,10 +363,33 @@ namespace President
             return cityName;
         }
 
-        public string findCityWithMinVotes()
+
+        public string FindCityWithMinInvalidVotes()
         {
+            Dictionary<string, int> cityWithInvalidBallots = new Dictionary<string, int>();
             int minVote = Int32.MaxValue;
             string nameOfCity = "";
+
+            foreach (var ballot in ballots)
+            {
+                if (!ballot.GetIsValid())
+                {
+                    if (!cityWithInvalidBallots.ContainsKey(ballot.GetCity()))
+                    {
+                        cityWithInvalidBallots.Add(ballot.GetCity(), 1);
+                    }
+                    else
+                    {
+                        cityWithInvalidBallots[ballot.GetCity()]++;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
+
+            }
+
 
             foreach (var city in cityWithInvalidBallots)
             {
@@ -410,7 +404,9 @@ namespace President
             return nameOfCity;
         }
 
-        public string cityWithMaxPaidVotes(List<Campaign> allCampaigns)
+
+
+        public string FindCityWithMaxPaidVotes(List<Campaign> allCampaigns)
         {
             string cityName = "";
             int votes = Int32.MaxValue;
@@ -446,7 +442,7 @@ namespace President
             return cityName;
         }
 
-        public Dictionary<string, List<string>> CandidateWithCity(List<Candidate> allCandidate)
+        public Dictionary<string, List<string>> ReturnAllCitiesAndCandidatesInEachCity(List<Candidate> allCandidate)
         {
             Dictionary<string, List<string>> citiesAndCandidates = new Dictionary<string, List<string>>();
 

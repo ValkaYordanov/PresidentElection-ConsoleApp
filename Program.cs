@@ -45,25 +45,23 @@ namespace President
             }
 
             CIK cik = CIK.Instance;
+            cik.candidates = allCandidates;
 
-
-            var queryForAllVoters =
+            var listOfAllVotersSortedByCity =
             from voter in allVotersList
             group voter by voter.getCity() into newGroup
             orderby newGroup.Key
             select newGroup;
 
-            //cik.startVoting(allVotersList); -< da dade po grad vsichki koito sa glasuvali i sa uspqli dadadat validna buletina
-            
-            Dictionary<string, Dictionary<string, int>> resultsFromVoting = cik.startVoting(queryForAllVoters, allCandidates);
+           
+            Dictionary<string, Dictionary<string, int>> resultsFromVoting = cik.StartVoting(listOfAllVotersSortedByCity, allCandidates);
 
             allVotersList.Clear();
             for (int i = 0; i < allCampaigns.Count; i++)
             {
-               
-                allVotersList.AddRange(allCampaigns[i].GetCampaignVoters());
+                allVotersList.AddRange(allCampaigns[i].allVotersInCampaign);
             }
-            queryForAllVoters =
+            listOfAllVotersSortedByCity =
             from voter in allVotersList
             group voter by voter.getCity() into newGroup
             orderby newGroup.Key
@@ -78,28 +76,28 @@ namespace President
                 }
             }
 
-            WinnerORunnerUp winner = cik.findWinner(resultsFromVoting);
+            WinnerORunnerUp winner = cik.FindWinner();
             Console.WriteLine("Winner is: " + winner.getName() + " with: " + winner.getVote() + " votes");
 
-            WinnerORunnerUp runnerUp = cik.runnerUp(resultsFromVoting);
+            WinnerORunnerUp runnerUp = cik.FindRunnerUp();
             Console.WriteLine("Runner up is: " + runnerUp.getName() + " with: " + runnerUp.getVote() + " votes");
 
-            Console.WriteLine("All voters/ballots: " + allVotersList.Count());
+            Console.WriteLine("All voters that vote: " + allVotersList.Count());
 
-            Console.WriteLine("Election activity: " + cik.electionActivity(allCampaigns) + "%");
+            Console.WriteLine("Election activity: " + cik.CalculateElectionActivity(allCampaigns) + "%");
 
-            Dictionary<string, double> dictionaryOfAllCity = cik.cityActivity(queryForAllVoters, allVotersList, allCampaigns);
+            Dictionary<string, double> dictionaryOfAllCity = cik.CalculateCityActivityForEachCity(listOfAllVotersSortedByCity, allVotersList, allCampaigns);
 
             foreach (var city in dictionaryOfAllCity)
             {
                 Console.WriteLine("Activity in " + city.Key + " is: " + city.Value + "%");
             }
 
-            Console.WriteLine("Paid votes: " + cik.paidVotes(allCampaigns) + "%");
+            Console.WriteLine("Paid votes: " + cik.CalculatePercentageOfAllPaidVotes(allCampaigns) + "%");
 
-            Console.WriteLine("Invalid ballots: " + cik.findInvalidBallots(allCampaigns) + "%");
+            Console.WriteLine("Invalid ballots: " + cik.FindPercentageOfInvalidBallots() + "%");
 
-            var citiesAndCandidates = cik.CandidateWithCity(allCandidates);
+            var citiesAndCandidates = cik.ReturnAllCitiesAndCandidatesInEachCity(allCandidates);
             foreach (var city in citiesAndCandidates)
             {
                 Console.WriteLine(city.Key + ":");
@@ -109,24 +107,25 @@ namespace President
                 }
             }
 
-            var favCandidate = cik.favCandidate(allVotersList);
+            var favCandidate = cik.CalculateFavoriteCandidateForEachVoterType(allVotersList);
             foreach (var type in favCandidate)
             {
                 Console.WriteLine(type.Key + "->" + type.Value);
             }
 
-            Console.WriteLine("City with max vote: " + cik.cityWithMaxVotes(resultsFromVoting));
+            Console.WriteLine("City with max vote: " + cik.FindCityWithMaxVotes(resultsFromVoting));
 
-            Console.WriteLine("City with minimum invalid vote: " + cik.findCityWithMinVotes());
+            Console.WriteLine("City with minimum invalid vote: " + cik.FindCityWithMinInvalidVotes());
 
-            Console.WriteLine("City with maximum paid vote: " + cik.cityWithMaxPaidVotes(allCampaigns));
+            Console.WriteLine("City with maximum paid vote: " + cik.FindCityWithMaxPaidVotes(allCampaigns));
 
-            Dictionary<string,int> educationListWithVotes = new Dictionary<string, int>(cik.educationVotesList);
-            foreach (var education in educationListWithVotes)
+          
+
+            Dictionary<string, int> eduListVotes = new Dictionary<string, int>(cik.CalculateVotesBasedOnEducation());
+            foreach (var education in eduListVotes)
             {
                 Console.WriteLine(education.Key + " -> " + education.Value);
             }
-
         }
     }
 }

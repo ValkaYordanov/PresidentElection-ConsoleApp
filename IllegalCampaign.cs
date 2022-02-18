@@ -8,10 +8,11 @@ namespace President
     public class IllegalCampaign : Campaign
     {
         Random random = new Random();
-        List<string> listOfNamesAndGenders = new List<string> { "Valentin male", "Georgi male", "Petyr male", "Galena female", "Ivan male", "Strahilka female", "Petra female", "Dancho male", "Gery female", "Vasil male", "Ivanka female" };
-        List<string> listOfCities = new List<string> { "Varna", "Sofia", "Veliko Tyrnovo", "Byrgas", "Smolqn", "Kazanlak", "Pernik" };
-       
-       
+        private const int percentageForCalculatingNumberOfPaidVoters = 50;
+        private const int percentageForCalculatingNumberOfVotersForOneDay = 120;
+        private const int minimummoneyToPayForPaidVoter = 30;
+        private const int maximummoneyToPayForPaidVoter = 51;
+
 
 
 
@@ -21,50 +22,21 @@ namespace President
         public override List<Voter> makeVoters()
         {
             int days = (int)(this.startDate - this.endDate).TotalDays;
-            int totalVoters = days * 120;
-            int paidVoters = (totalVoters / 100) * 50;
+            int totalVoters = days * percentageForCalculatingNumberOfVotersForOneDay;
+            int paidVoters = (totalVoters / 100) * percentageForCalculatingNumberOfPaidVoters;
             List<Voter> allVoters = new List<Voter>();
 
 
             for (int i = 0; i < totalVoters; i++)
             {
-                int randomVoterType = random.Next(1, 4);
-
-                int indexOfRandomName = random.Next(listOfNamesAndGenders.Count);
-                string name = listOfNamesAndGenders[indexOfRandomName].Split(' ').FirstOrDefault();
-                string gender = listOfNamesAndGenders[indexOfRandomName].Split(' ').Skip(1).FirstOrDefault();
-
-                int indexOfRandomCity = random.Next(listOfCities.Count);
-                string city = listOfCities[indexOfRandomCity]; 
-                VotesPerCity(city);
-
-                if (randomVoterType == 1)
-                {
-                    UnlearnedVoter unlearnedVoter = new UnlearnedVoter(name, gender, city, this.candidate, false, this);
-                    unlearnedVoters.Add(unlearnedVoter);
-                }
-                else if (randomVoterType == 2)
-                {
-                    MiddleClassVoter middleClassVoter = new MiddleClassVoter(name, gender, city, this.candidate, false, this);
-                    middleClassVoters.Add(middleClassVoter);
-                }
-                else if (randomVoterType == 3)
-                {
-                    RichVoter richVoter = new RichVoter(name, gender, city, this.candidate, false, this);
-                    richVoters.Add(richVoter);
-                }
+                allVotersInCampaign.Add(this.CreateOneVoter());
             }
-
-           
-
-            allVoters.AddRange(unlearnedVoters);
-            allVoters.AddRange(middleClassVoters);
-            allVoters.AddRange(richVoters);
+            allVoters.AddRange(allVotersInCampaign);
             allVotesForCampaign = allVoters.Count();
 
             for (int i = 0; i < paidVoters; i++)
             {
-                int money = random.Next(30, 51);
+                int money = random.Next(minimummoneyToPayForPaidVoter, maximummoneyToPayForPaidVoter);
 
                 if ((this.compaignMoney - money) < 0)
                 {
